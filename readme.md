@@ -124,3 +124,56 @@ The API will be live at `http://127.0.0.1:8000`, and the interactive documentati
 * `/cars/`: Manages public car listings, checking availability, and admin-only car creation.
 * `/reservations/`: Handles creation, viewing, and canceling of reservations by authenticated users.
 * `/admin/`: Provides protected endpoints for managing the full lifecycle of cars and reservations (viewing, approving, canceling, deleting).
+
+## Testing
+
+This project includes a test suite built with pytest. The tests cover unit-level functionality (like token generation and password hashing) as well as integration-level API testing (like user registration, login flows, and reservation conflicts).
+
+### Test environment setup
+
+The test suite is designed to run against a live database. It's highly recommended to use a separate database and a .env.test file.
+
+1. Create `.env.test`: In your project root, create this file. It should point to a separate test database.
+```
+# Point to a test database
+DB_URL=postgresql+psycopg://postgres:your_password@localhost:5432/car_rental_test
+
+# Use the same secrets as your main .env
+SECRET_KEY=your_very_string_32_character_secret_key
+ALGORITHM=HS256
+# ... (include any other required env vars) ...
+```
+
+2. Create a pytest.ini: 
+```
+[pytest]
+env_files =
+    .env.test
+```
+
+### Running the Tests
+
+**Important:** all tests must be run using the `pytest` command from the project's root directory. This allows the test files to use absolute imports like `from backend.models import Users`.
+
+Running the files directly (e.g., python backend/testing/test_auth.py) will fail with a ModlueNotFoundError or ImportError.
+
+### Test Coverage Overview
+The suite is structured to test all critical components of the API:
+* TestAuth (Authentication Flow):
+    * Uses a pytest fixture to generate test user data
+    * Tests the full user lifecycle:
+     * Successful registration (`200 ok`)
+     * Duplicate email (`409 conflict`)
+     * Login with correct and incorrect credentials (`200 OK, 401 Unauthorized`)
+     * Token refresh flow with CSRF validation(`200 ok, 403 Forbidden`)
+     * Secure logout (verifying the refresh token is deleted from the DB)
+* TestJwt (Token Security):
+    * A pure unit test that validates the `create_access_token` and `create_refresh_token` functions
+    * Assert that the token payloads (`sub`, `type`, `jti`) are correct
+    * Verifies security by asserting that `pytest.raises(JWTError)` is triggered when decoding with an incorrect `SECRET KEY` or `access_token`
+* TestReservations (Business Logic)
+    * Uses a fixture to create a `Car` for the test
+    * Confirms that a valid reservation returns a `200 ok`
+    * Critically, it tests the reservation conflict logic, asserting that an overlapping booking for the same car returns a `409 Conflict`
+* TestUserAuth (Hashing)
+    * A simple, fast unit test to confirm that `hash_password` and `verify_password` are working correctly
