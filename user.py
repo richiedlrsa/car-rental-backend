@@ -1,6 +1,5 @@
 from models import Users, UserBase
 from db import SessionDep
-from config import settings
 from sqlmodel import select, Session
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status

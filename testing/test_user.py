@@ -1,4 +1,4 @@
-from backend.user import hash_password, verify_password
+from user import hash_password, verify_password
 
 class TestUserAuth:
     def test_password_verification(self):

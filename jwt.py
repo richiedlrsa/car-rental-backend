@@ -48,7 +48,7 @@ def create_refresh_token(email: str) -> tuple:
         "type": "refresh",
         "jti": jti,
         "iat": int(now.timestamp()),
-        "exp": expires
+        "exp": int(expires.timestamp())
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return token, jti, now, expires

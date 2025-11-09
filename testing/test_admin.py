@@ -1,9 +1,9 @@
 from fastapi.testclient import TestClient
 from datetime import datetime, timedelta, timezone
-from backend.main import app
-from backend.db import engine
-from backend.models import Users, Cars, Reservations
-from backend.user import hash_password
+from main import app
+from db import engine
+from models import Users, Cars, Reservations
+from user import hash_password
 from sqlmodel import Session, select
 from uuid import uuid4
 import pytest
@@ -89,8 +89,12 @@ def info():
 
        client.post("/user/logout", headers={'Authorization': f'Bearer {user_access_token}'})
        client.post("/user/logout", headers={'Authorization': f'Bearer {admin_access_token}'})
-       db.delete(reservation)
-       db.commit()
+       reservation_exists = db.exec(select(Reservations).where(Reservations.id == reservation.id)).first()
+       # our cars/delete endpoint test should delete the reservation, so it will not exist
+       # in this scope
+       if reservation_exists:
+        db.delete(reservation)
+        db.commit()
        db.delete(user)
        db.delete(admin)
        

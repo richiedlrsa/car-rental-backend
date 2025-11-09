@@ -6,7 +6,7 @@ from uuid import uuid4
 from config import settings
 from db import SessionDep
 from user import authenticate_user, get_current_user, hash_password
-from jwt import create_access_token, create_refresh_token, set_refresh_cookie, clear_refresh_cookie
+from auth_tokens import create_access_token, create_refresh_token, set_refresh_cookie, clear_refresh_cookie
 from models import RefreshTokens, UserToCreate, Users, UserBase
 from dotenv import load_dotenv, find_dotenv
 import os
@@ -50,7 +50,7 @@ async def get_access_token(db: SessionDep, response: Response, form_data: OAuth2
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/register")
-async def create_new_user(db: SessionDep, user_info: UserToCreate, response: Response):
+async def create_new_user(db: SessionDep, user_info: UserToCreate):
     stmt = select(Users).where(Users.email == user_info.email)
     user_exists = db.exec(stmt).first()
     if user_exists:
@@ -61,14 +61,6 @@ async def create_new_user(db: SessionDep, user_info: UserToCreate, response: Res
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    
-    refresh_token, jti, issued_at, expire_date = create_refresh_token(new_user.email)
-    db_refresh_token = RefreshTokens(jti=jti, user_id=new_user.id, issued_at=issued_at, expires_at=expire_date)
-    db.add(db_refresh_token)
-    db.commit()
-    
-    csrf_token = str(uuid4())
-    set_refresh_cookie(resp=response, refresh_token=refresh_token, csrf_token=csrf_token)
     
     return {'detail': 'account created successfully'}
 
