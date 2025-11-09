@@ -13,3 +13,5 @@ imagekit = ImageKit(
     public_key=PUBLIC_KEY,
     url_endpoint=URL
 )
+
+print(path)

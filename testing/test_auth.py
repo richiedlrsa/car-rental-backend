@@ -1,13 +1,11 @@
-from backend.db import engine
+from db import engine
 from sqlmodel import Session, select
-from backend.main import app
-from backend.models import Users, RefreshTokens 
-from backend.user import hash_password
+from main import app
+from models import Users, RefreshTokens 
+from user import hash_password
 from fastapi.testclient import TestClient
 from sqlmodel import select
-from string import ascii_lowercase
 from uuid import uuid4
-import random as r
 import pytest
 
 client = TestClient(app)

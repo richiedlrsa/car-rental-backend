@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
-from backend.main import app
-from backend.db import engine
-from backend.models import Cars, Reservations
+from main import app
+from db import engine
+from models import Cars, Reservations
 from sqlmodel import Session, select
 from datetime import datetime, timedelta, timezone
 import random
@@ -28,6 +28,7 @@ def car():
         yield db_car
         
         db.delete(db_car)
+        db.commit()
         
 class TestReservations:
     def test_add_reservation(self, car):
@@ -60,3 +61,4 @@ class TestReservations:
             reservations = db.exec(select(Reservations).where(Reservations.car_id == car.id)).all()
             for r in reservations:
                 db.delete(r)
+            db.commit()

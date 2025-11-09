@@ -25,7 +25,7 @@ async def add_reservation(db: SessionDep, reservation: ReservationBase):
     try:
         db.add(db_reservation)
         db.commit()
-    except IntegrityError:
-       raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="The selected car is not available for these dates.") 
+    except IntegrityError as e:
+       raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'Failed to add reservation. {e}') 
 
     return {"success": "reservation successfully added"}
