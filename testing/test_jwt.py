@@ -1,6 +1,5 @@
-from backend.auth_tokens import create_access_token, create_refresh_token
-from backend.config import settings
-from backend.user import verify_password, hash_password
+from auth_tokens import create_access_token, create_refresh_token
+from config import settings
 from jose import jwt, JWTError
 from dotenv import find_dotenv, load_dotenv
 from datetime import timedelta

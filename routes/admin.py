@@ -23,7 +23,7 @@ async def get_reservation_counts(db: SessionDep, user: UserBase = Depends(get_cu
     return {'active': active_reservations, 'inactive': inactive_reservations, 'all': all_reservations}
 
 @router.get("/reservations")
-async def get_reservations(db:SessionDep, status: str | None = None, cursor: int | None = None, limit: int | None = None, user: UserBase = Depends(get_current_user)):
+async def get_reservations(db:SessionDep, statuses: str | None = None, cursor: int | None = None, limit: int | None = None, user: UserBase = Depends(get_current_user)):
     if not user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
@@ -34,7 +34,7 @@ async def get_reservations(db:SessionDep, status: str | None = None, cursor: int
     if not limit:
         limit = 20
         
-    match status:
+    match statuses:
         case 'active':
             db_statuses = {'pending', 'active', 'confirmed'}
         case 'inactive':
@@ -45,8 +45,8 @@ async def get_reservations(db:SessionDep, status: str | None = None, cursor: int
     condition = [Reservations.status.in_(db_statuses)]
     if cursor:
         condition.append(Reservations.id >= cursor)
-    stmt = select(Reservations, Cars).where(*condition).join(Cars).order_by(Reservations.id).limit(limit + 1).all()
-    results = db.exec(stmt)
+    stmt = select(Reservations, Cars).where(*condition).join(Cars).order_by(Reservations.id).limit(limit + 1)
+    results = db.exec(stmt).all()
     if not results:
         return {'response': f'No {status if status != 'all' else 'found'} reservations'}
     reservations_resp = []
