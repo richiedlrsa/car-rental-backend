@@ -10,6 +10,7 @@ imagekitio==4.2.0
 passlib==1.7.4
 psycopg-binary==3.2.12
 psycopg-pool==3.2.7
+psycopg
 pydantic==2.12.4
 pydantic-settings==2.11.0
 pytest==9.0.0

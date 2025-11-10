@@ -39,9 +39,33 @@ The purpose of this project was to build a production-ready, secure, and efficie
 * **Image Storage:** **ImageKit.io**
 * **Server:** **Uvicorn**
 
-## Setup and Installation
+## Setup with Docker (Recommended)
 
-Follow these steps to get the project running locally.
+This is the fastest way to get the API runing, as it bundles the application and its dependencies into a single container.
+
+### Prerequisites
+
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
+* A running PostgreSQL database on your host machine.
+
+### 1. Build the Image
+
+From the root of the project, run:
+```bash
+docker build -t car-rental-api .
+```
+
+### 2. Run the Container
+
+Run the following command. This will start your container, map port 8000, load the evironment variable, and override the `DB_URL` to connect to your host's database.
+
+```bash
+docker run -d -p 8000:8000 -e DB_URL=postgresql+psycopg://postgres:your_password@host.docker.internal:5432/car_rental_d --env-file ./.env car-rental-api
+```
+
+*(Note: In the `DB_URL`, replace the `posgres:your_password` and `car_rental_d` with your own database credentials, butkeep `host.docker.internal:5432` as the host and port.)*
+
+## Setup without Docker
 
 ### 1. Prerequisites
 
