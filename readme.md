@@ -150,13 +150,6 @@ ALGORITHM=HS256
 env_files =
     .env.test
 ```
-
-### Running the Tests
-
-**Important:** all tests must be run using the `pytest` command from the project's root directory. This allows the test files to use absolute imports like `from backend.models import Users`.
-
-Running the files directly (e.g., python backend/testing/test_auth.py) will fail with a ModlueNotFoundError or ImportError.
-
 ### Test Coverage Overview
 The suite is structured to test all critical components of the API:
 * TestAuth (Authentication Flow):
